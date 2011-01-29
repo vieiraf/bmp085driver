@@ -6,9 +6,9 @@
 // Note that Serial is set to 115200.
 
 #include <Wire.h>
-#include "BMP085.h"
+#include <BMP085.h>
 
-BMP085 dps;      // Digital Pressure Sensor 
+BMP085 dps = BMP085();      // Digital Pressure Sensor 
 
 float Pressure = 0, Altitude = 0;
 unsigned long time1=0;

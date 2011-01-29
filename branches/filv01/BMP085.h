@@ -105,15 +105,18 @@ public:
   void calcTrueTemperature();                   // calc temperature data b5 (only needed if AUTO_UPDATE_TEMPERATURE is false)  
   void calcTruePressure(long *_TruePressure);   // calc Pressure in Pa     
   // dummy stuff
-  void dumpRegisters();                         // debug only
-  void dumpCalData();                           // debug only
+   void dumpCalData();                           // debug only
 
+  void writemem(uint8_t _addr, uint8_t _val);
+  void readmem(uint8_t _addr, uint8_t _nbytes, uint8_t __buff[]);
+  
   private:
+  
   int ac1,ac2,ac3,b1,b2,mb,mc,md;               // cal data  
   unsigned int ac4,ac5,ac6;                     // cal data
   long b5;                                      // temperature data
   
-  int _dev_address;
+  uint8_t _dev_address;
   byte _buff[BUFFER_SIZE];                      // buffer  MSB LSB XLSB
   byte _oss;                                    // OverSamplingSetting
   int _pressure_waittime[4];                    // Max. Conversion Time Pressure is ms for each mode
@@ -123,10 +126,7 @@ public:
 
   void getCalData();        
   
-  void writemem(byte _addr, byte _val);
-  void readmem(byte _addr, int _nbytes, byte __buff[]);
+
 };
-/* dummy stuff */
-void print_bits(byte val);
-//void print_unit16(uint16_t val);
+
 #endif
