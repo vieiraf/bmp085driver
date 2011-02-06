@@ -1,8 +1,8 @@
 /****************************************************************************
-* BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino       *
+* BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino     *
 * Copyright 2010 Filipe Vieira                                              *
 *                                                                           *
-* This file  is part of BMP085 Arduino library.                             *
+* This file is part of BMP085 Arduino library.                              *
 *                                                                           *
 * This library is free software: you can redistribute it and/or modify      *
 * it under the terms of the GNU Lesser General Public License as published  *
@@ -18,16 +18,16 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
 ****************************************************************************/
 /****************************************************************************
-*  Tested on Arduino Mega with BMP085 Breakout                              *
-*  SDA     -> pin 20      (no pull up resistors)                            *
-*  SCL     -> pin 21      (no pull up resistors)                            *
-*  XCLR     -> not connected                                                *
-*  EOC     -> not connected                                                 *
-*  GND     -> pin GND                                                       *
-*  VCC      -> pin 3.3V                                                     *
+* Tested on Arduino Mega with BMP085 Breakout                               *
+* SDA   -> pin 20   (no pull up resistors)                                  *
+* SCL   -> pin 21   (no pull up resistors)                                  *
+* XCLR  -> not connected                                                    *
+* EOC   -> not connected                                                    *
+* GND   -> pin GND                                                          *
+* VCC   -> pin 3.3V                                                         *
 * NOTE: SCL and SDA needs pull-up resistors for each I2C bus.               *
-*    2.2kOhm..10kOhm, typ. 4.7kOhm                                          *
-****************************************************************************/
+*  2.2kOhm..10kOhm, typ. 4.7kOhm                                            *
+*****************************************************************************/
 #ifndef BMP085_h
 #define BMP085_h
 
