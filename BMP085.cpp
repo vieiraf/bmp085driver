@@ -28,8 +28,8 @@
 * NOTE: SCL and SDA needs pull-up resistors for each I2C bus.               *
 *  2.2kOhm..10kOhm, typ. 4.7kOhm                                            *
 *****************************************************************************/
-#include "BMP085.h"
 #include <Wire.h>
+#include <BMP085.h>
 
 BMP085::BMP085() {
   _dev_address = BMP085_DEFAULT_ADDR;
@@ -159,31 +159,6 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   *_TruePressure = p + ((x1 + x2 + 3791) >> 4);
 }
 
-void BMP085::dumpRegisters() {
-  int ValidRegisterAddr[]={0xAA,0xAB,0xAC,0xAD,0xAE,0xAF,0xB0,0xB1,0xB2,0xB3,0xB4,0xB5,0xB6,0xB7,0xB8,0xB9,0xBA,0xBB,0xBC,0xBD,0xBE,0xBF,0xF6,0xF7,0xF8,0xF9}; 
-  byte _b, i, totregisters = sizeof(ValidRegisterAddr)/sizeof(int *);
-  Serial.println("---dump start---");
-  Serial.println("Register address|Resgister data");
-  Serial.println("hex dec | 76543210 dec hex");
-  for (i=0;i<totregisters;i++){    
-    Serial.print("0x");
-    Serial.print(ValidRegisterAddr[i], HEX);
-    Serial.print(" ");
-    Serial.print(ValidRegisterAddr[i], DEC);
-    Serial.print(" |");
-    readmem(ValidRegisterAddr[i], 1, &_b);
-    Serial.print("b");
-    print_bits(_b);
-    Serial.print(" ");
-    Serial.print(_b,DEC);
-    Serial.print(" 0x");
-    Serial.print(_b,HEX);
-    Serial.println("");    
-  }
-  Serial.println("---dump end---");
-}
-
-
 void BMP085::dumpCalData() {
   Serial.println("---cal data start---");
   Serial.print("ac1:");
@@ -238,37 +213,27 @@ void BMP085::getCalData() {
   md = ((int)_buff[0] <<8 | ((int)_buff[1])); 
 }
 
-void BMP085::writemem(byte _addr, byte _val) {
-  Wire.beginTransmission(_dev_address);  // start transmission to device 
-  Wire.send(_addr);                // send register address
-  Wire.send(_val);                // send value to write
-  Wire.endTransmission();         // end transmission
+
+void BMP085::writemem(uint8_t _addr, uint8_t _val) {
+  Wire.beginTransmission(_dev_address);   // start transmission to device 
+  Wire.send(_addr); // send register address
+  Wire.send(_val); // send value to write
+  Wire.endTransmission(); // end transmission
 }
 
-void BMP085::readmem(byte _addr, int _nbytes, byte __buff[]) {
-  Wire.beginTransmission(_dev_address);  // start transmission to device 
-  Wire.send(_addr);                  // sends register address to read from
-  Wire.endTransmission();             // end transmission
-  Wire.beginTransmission(_dev_address);   // start transmission to device 
+void BMP085::readmem(uint8_t _addr, uint8_t _nbytes, uint8_t __buff[]) {
+  Wire.beginTransmission(_dev_address); // start transmission to device 
+  Wire.send(_addr); // sends register address to read from
+  Wire.endTransmission(); // end transmission
+  
+  Wire.beginTransmission(_dev_address); // start transmission to device 
   Wire.requestFrom(_dev_address, _nbytes);// send data n-bytes read
- 
-  byte i = 0; 
-  while (Wire.available()) {    
-    __buff[i] = Wire.receive();        // receive DATA
+  uint8_t i = 0; 
+  while (Wire.available()) {
+    __buff[i] = Wire.receive(); // receive DATA
     i++;
   }
-  Wire.endTransmission();         // end transmission
+  Wire.endTransmission(); // end transmission
 }
 
 
-void print_bits(byte val){
-  int i;
-  for(i=7; i>=0; i--) 
-    Serial.print(val >> i & 1, BIN);
-}
-/* void print_unit16(uint16_t val){
-  int i;
-  for(i=15; i>=0; i--) 
-    Serial.print(val >> i & 1, BIN);
-} 
-*/
