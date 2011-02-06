@@ -1,8 +1,8 @@
 /****************************************************************************
-* BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino       *
+* BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino     *
 * Copyright 2010 Filipe Vieira                                              *
 *                                                                           *
-* This file  is part of BMP085 Arduino library.                             *
+* This file is part of BMP085 Arduino library.                              *
 *                                                                           *
 * This library is free software: you can redistribute it and/or modify      *
 * it under the terms of the GNU Lesser General Public License as published  *
@@ -18,16 +18,16 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
 ****************************************************************************/
 /****************************************************************************
-*  Tested on Arduino Mega with BMP085 Breakout                              *
-*  SDA     -> pin 20      (no pull up resistors)                            *
-*  SCL     -> pin 21      (no pull up resistors)                            *
-*  XCLR     -> not connected                                                *
-*  EOC     -> not connected                                                 *
-*  GND     -> pin GND                                                       *
-*  VCC      -> pin 3.3V                                                     *
+* Tested on Arduino Mega with BMP085 Breakout                               *
+* SDA   -> pin 20   (no pull up resistors)                                  *
+* SCL   -> pin 21   (no pull up resistors)                                  *
+* XCLR  -> not connected                                                    *
+* EOC   -> not connected                                                    *
+* GND   -> pin GND                                                          *
+* VCC   -> pin 3.3V                                                         *
 * NOTE: SCL and SDA needs pull-up resistors for each I2C bus.               *
-*    2.2kOhm..10kOhm, typ. 4.7kOhm                                          *
-****************************************************************************/
+*  2.2kOhm..10kOhm, typ. 4.7kOhm                                            *
+*****************************************************************************/
 #ifndef BMP085_h
 #define BMP085_h
 
@@ -105,15 +105,18 @@ public:
   void calcTrueTemperature();                   // calc temperature data b5 (only needed if AUTO_UPDATE_TEMPERATURE is false)  
   void calcTruePressure(long *_TruePressure);   // calc Pressure in Pa     
   // dummy stuff
-  void dumpRegisters();                         // debug only
-  void dumpCalData();                           // debug only
+   void dumpCalData();                           // debug only
 
+  void writemem(uint8_t _addr, uint8_t _val);
+  void readmem(uint8_t _addr, uint8_t _nbytes, uint8_t __buff[]);
+  
   private:
+  
   int ac1,ac2,ac3,b1,b2,mb,mc,md;               // cal data  
   unsigned int ac4,ac5,ac6;                     // cal data
   long b5;                                      // temperature data
   
-  int _dev_address;
+  uint8_t _dev_address;
   byte _buff[BUFFER_SIZE];                      // buffer  MSB LSB XLSB
   byte _oss;                                    // OverSamplingSetting
   int _pressure_waittime[4];                    // Max. Conversion Time Pressure is ms for each mode
@@ -123,10 +126,7 @@ public:
 
   void getCalData();        
   
-  void writemem(byte _addr, byte _val);
-  void readmem(byte _addr, int _nbytes, byte __buff[]);
+
 };
-/* dummy stuff */
-void print_bits(byte val);
-//void print_unit16(uint16_t val);
+
 #endif

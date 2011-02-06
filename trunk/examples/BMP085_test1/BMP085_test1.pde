@@ -4,9 +4,9 @@
 // This example requires AUTO_UPDATE_TEMPERATURE to be true in bmp085.h otherwise temperature will not update.
 
 #include <Wire.h>
-#include "BMP085.h"
+#include <BMP085.h>
 
-BMP085 dps;      // Digital Pressure Sensor 
+BMP085 dps = BMP085();      // Digital Pressure Sensor 
 
 float Temperature = 0, Pressure = 0, Altitude = 0;
 
