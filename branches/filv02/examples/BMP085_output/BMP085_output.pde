@@ -1,12 +1,12 @@
 // BMP085_output
-// by Filipe Vieira - 2010
+// by Filipe Vieira
 // Simple example of library usage with almost every BMP085 and lib features being used.
 
 #include <Wire.h>
 #include <BMP085.h>
 
 BMP085 dps = BMP085();
-float Temperature = 0, Pressure = 0, Altitude = 0;
+long Temperature = 0, Pressure = 0, Altitude = 0;
 
 void setup(void) {
   Serial.begin(9600);
@@ -35,9 +35,9 @@ void loop(void) {
   
   Serial.print("Temp(C):");
   Serial.print(Temperature);
-  Serial.print("  Alt(m):");
+  Serial.print("  Alt(cm):");
   Serial.print(Altitude);
-  Serial.print("  Pressure(hPa):");
+  Serial.print("  Pressure(Pa):");
   Serial.println(Pressure);
 }
 

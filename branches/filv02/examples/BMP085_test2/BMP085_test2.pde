@@ -1,5 +1,5 @@
 // BMP085_test2
-// by Filipe Vieira - 2010
+// by Filipe Vieira
 // Simple test of BMP085 output using default settings using dynamic update.
 // NOTE: in order to take full advantage of dynamic measurement, automatic temperature updates must be disabled.
 // Changing AUTO_UPDATE_TEMPERATURE to false in bmp085.h will do it.
@@ -10,7 +10,7 @@
 
 BMP085 dps = BMP085();      // Digital Pressure Sensor 
 
-float Pressure = 0, Altitude = 0;
+long Pressure = 0, Altitude = 0;
 unsigned long time1=0;
 
 void setup(void) {
@@ -20,19 +20,18 @@ void setup(void) {
   
   // uncomment for different initialization settings
   //dps.init();     // QFE (Field Elevation above ground level) is set to 0 meters.
-                  // same as init(MODE_STANDARD, 0.0, true);
+                  // same as init(MODE_STANDARD, 0, true);
   
-  //dps.init(MODE_STANDARD, 1018.50, false);  //  false = using hpa units
+  //dps.init(MODE_STANDARD, 101850, false);  // 101850Pa = 1018.50hPa, false = using hpa units
                   // this initialization is useful for normalizing pressure to specific datum.
                   // OR setting current local hPa information from a weather station/local airport (QNH).
   
-  dps.init(MODE_STANDARD, 250.0, true);  // true = using meter units
+  dps.init(MODE_STANDARD, 25000, true);  // 250 meters, true = using meter units
                   // this initialization is useful if current altitude is known,
                   // pressure will be calculated based on TruePressure and known altitude.
 
   // note: use zeroCal only after initialization.
-  // dps.zeroCal(1018.00, 0.0);    // set zero point
-  
+  // dps.zeroCal(101800, 0);    // set zero point
 }            
 
 void loop(void) {   
@@ -46,8 +45,8 @@ void loop(void) {
   dps.getPressure(&Pressure);
   dps.getAltitude(&Altitude);
 
-  Serial.print("  Alt(m):");
+  Serial.print("  Alt(cm):");
   Serial.print(Altitude);
-  Serial.print("  Pressure(hPa):");
+  Serial.print("  Pressure(Pa):");
   Serial.println(Pressure);
 }

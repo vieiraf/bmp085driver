@@ -32,20 +32,20 @@
 #include <BMP085.h>
 
 BMP085::BMP085() {
-  _dev_address = BMP085_DEFAULT_ADDR;
+  _dev_address = BMP085_ADDR;
   _pressure_waittime[0] = 4500; // These are maximum convertion times.
   _pressure_waittime[1] = 7500; // It is possible to use pin EOC (End Of Conversion)
-  _pressure_waittime[2] = 13500;  // to check if conversion is finished (logic 1) 
-  _pressure_waittime[3] = 25500;  // or running (logic 0) insted of waiting for convertion times.
-  _meter_Offset = 0.0;
-  _hPa_Offset = 0.0;
+  _pressure_waittime[2] = 13500;// to check if conversion is finished (logic 1) 
+  _pressure_waittime[3] = 25500;// or running (logic 0) insted of waiting for convertion times.
+  _cm_Offset = 0;
+  _Pa_Offset = 0;               // 1hPa = 100Pa = 1mbar
 }
 
 void BMP085::init() {  
-  init(MODE_STANDARD, 0.0, true);
+  init(MODE_STANDARD, 0, true);
 }
 
-void BMP085::init(byte _BMPMode, float _initVal, bool _Unitmeters){     
+void BMP085::init(byte _BMPMode, int32_t _initVal, bool _Unitmeters){     
   getCalData();               // initialize cal data
   calcTrueTemperature();      // initialize b5
   setMode(_BMPMode);
@@ -64,52 +64,52 @@ void BMP085::setMode(byte _BMPMode){
   _oss = _BMPMode;
 }
 
-void BMP085::setLocalPressure(float _hPa){   
-  float tmp_alt;
+void BMP085::setLocalPressure(int32_t _Pa){   
+  int32_t tmp_alt;
  
-  _param_datum = _hPa;   
+  _param_datum = _Pa;   
   getAltitude(&tmp_alt);    // calc altitude based on current pressure   
-  _param_meters = tmp_alt;
+  _param_centimeters = tmp_alt;
 }
 
-void BMP085::setLocalAbsAlt(float _meters){  
-  float tmp_hpa;
+void BMP085::setLocalAbsAlt(int32_t _centimeters){  
+  int32_t tmp_Pa;
  
-  _param_meters = _meters;   
-  getPressure(&tmp_hpa);    // calc pressure based on current altitude
-  _param_datum = tmp_hpa;
+  _param_centimeters = _centimeters;   
+  getPressure(&tmp_Pa);    // calc pressure based on current altitude
+  _param_datum = tmp_Pa;
 }
 
-void BMP085::setAltOffset(float _meters){
-  _meter_Offset = _meters;
+void BMP085::setAltOffset(int32_t _centimeters){
+  _cm_Offset = _centimeters;
 }
 
-void BMP085::sethPaOffset(float _hPa){
-  _hPa_Offset = _hPa;
+void BMP085::sethPaOffset(int32_t _Pa){
+  _Pa_Offset = _Pa;
 }
 
-void BMP085::zeroCal(float _hPa, float _meters){
-  setAltOffset(_meters - _param_meters);    
-  sethPaOffset(_hPa - _param_datum);    
+void BMP085::zeroCal(int32_t _Pa, int32_t _centimeters){
+  setAltOffset(_centimeters - _param_centimeters);    
+  sethPaOffset(_Pa - _param_datum);    
 }
 
-void BMP085::getPressure(float *_hPa){   
-  long TruePressure = 0;
+void BMP085::getPressure(int32_t *_Pa){   
+  long TruePressure;
 
   calcTruePressure(&TruePressure); 
-  *_hPa = TruePressure / 100.0 / pow((1.0 - _param_meters / 44330.0), 5.255) + _hPa_Offset;
+  *_Pa = TruePressure / pow((1 - (float)_param_centimeters / 4433000), 5.255) + _Pa_Offset;
 }
 
-void BMP085::getAltitude(float *_meters){  
-  long TruePressure = 0;
+void BMP085::getAltitude(int32_t *_centimeters){
+  long TruePressure;
 
-  calcTruePressure(&TruePressure);  
-  *_meters = 44330.0 * (1.0 - pow(((TruePressure / 100.0) / _param_datum), 0.190295)) + _meter_Offset;  
+  calcTruePressure(&TruePressure);
+  *_centimeters =  4433000 * (1 - pow((TruePressure / (float)_param_datum), 0.190295)) + _cm_Offset;  
 }
 
-void BMP085::getTemperature(float *_Temperature) {
+void BMP085::getTemperature(int32_t *_Temperature) {
   calcTrueTemperature();                            // force b5 update
-  *_Temperature = ((b5 + 8) >> 4) / 10.0;
+  *_Temperature = ((b5 + 8) >> 4);
 }
 
 void BMP085::calcTrueTemperature(){
@@ -146,13 +146,13 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   x1 = (b2* (b6 * b6 >> 12)) >> 11;
   x2 = ac2 * b6 >> 11;
   x3 = x1 + x2;
-  b3 = (((int32_t)ac1 * 4 + x3) << _oss) + 2 >> 2;
+  b3 = ((((int32_t)ac1 * 4 + x3) << _oss) + 2) >> 2;  // not working for oss = 3 
   x1 = ac3 * b6 >> 13;
   x2 = (b1 * (b6 * b6 >> 12)) >> 16;
   x3 = ((x1 + x2) + 2) >> 2;
   b4 = (ac4 * (uint32_t) (x3 + 32768)) >> 15;
-  b7 = ((uint32_t) up - b3) * (50000 >> _oss);
-  p = b7 < 0x80000000 ? (b7 * 2) / b4 : (b7 / b4) * 2;
+  b7 = ((uint32_t)up - b3) * (50000 >> _oss);
+  p = b7 < 0x80000000 ? (b7 << 1) / b4 : (b7 / b4) << 1;
   x1 = (p >> 8) * (p >> 8);
   x1 = (x1 * 3038) >> 16;
   x2 = (-7357 * p) >> 16;
