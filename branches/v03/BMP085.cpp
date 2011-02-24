@@ -39,6 +39,8 @@ BMP085::BMP085() {
   _pressure_waittime[3] = 25500;// or running (logic 0) insted of waiting for convertion times.
   _cm_Offset = 0;
   _Pa_Offset = 0;               // 1hPa = 100Pa = 1mbar
+  
+  oldEMA = 0;
 }
 
 void BMP085::init() {  
@@ -103,7 +105,7 @@ void BMP085::getPressure(int32_t *_Pa){
 void BMP085::getAltitude(int32_t *_centimeters){
   long TruePressure;
 
-  calcTruePressure(&TruePressure);
+  calcTruePressure(&TruePressure); 
   *_centimeters =  4433000 * (1 - pow((TruePressure / (float)_param_datum), 0.190295)) + _cm_Offset;  
 }
 
@@ -130,6 +132,7 @@ void BMP085::calcTrueTemperature(){
 void BMP085::calcTruePressure(long *_TruePressure) {
   long up,x1,x2,x3,b3,b6,p;
   unsigned long b4,b7;
+  int32_t tmp; 
 
   #if AUTO_UPDATE_TEMPERATURE
   calcTrueTemperature();        // b5 update 
@@ -146,7 +149,10 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   x1 = (b2* (b6 * b6 >> 12)) >> 11;
   x2 = ac2 * b6 >> 11;
   x3 = x1 + x2;
-  b3 = ((((int32_t)ac1 * 4 + x3) << _oss) + 2) >> 2;  // not working for oss = 3 
+  //b3 = ((((int32_t)ac1 * 4 + x3) << _oss) + 2) >> 2;  // not working for oss = 3  
+  tmp = ac1;
+  tmp = (tmp * 4 + x3) << _oss;
+  b3 = (tmp + 2) >> 2;    // not working for oss = 3
   x1 = ac3 * b6 >> 13;
   x2 = (b1 * (b6 * b6 >> 12)) >> 16;
   x3 = ((x1 + x2) + 2) >> 2;
@@ -157,6 +163,13 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   x1 = (x1 * 3038) >> 16;
   x2 = (-7357 * p) >> 16;
   *_TruePressure = p + ((x1 + x2 + 3791) >> 4);
+  
+  #ifdef FILTERED_PRESSURE
+  if (oldEMA != 0) // 1st run?
+    *_TruePressure = oldEMA + SMOOTHING_FACTOR * (*_TruePressure - oldEMA);    
+  oldEMA = *_TruePressure;  
+  #endif
+
 }
 
 void BMP085::dumpCalData() {
