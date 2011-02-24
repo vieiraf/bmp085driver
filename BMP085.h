@@ -1,5 +1,5 @@
 /****************************************************************************
-* BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino     *
+* BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino       *
 * Copyright 2010 Filipe Vieira                                              *
 *                                                                           *
 * This file is part of BMP085 Arduino library.                              *
@@ -33,7 +33,7 @@
 
 #include "WProgram.h"
 
-#define BMP085_DEFAULT_ADDR         0x77     //0x77 default I2C address
+#define BMP085_ADDR                 0x77     //0x77 default I2C address
 #define BUFFER_SIZE                 3
 
 #define AUTO_UPDATE_TEMPERATURE     true    //default is true
@@ -53,8 +53,14 @@
 #define CAL_MB            0xBA  // R   Calibration data (16 bits)
 #define CAL_MC            0xBC  // R   Calibration data (16 bits)
 #define CAL_MD            0xBE  // R   Calibration data (16 bits)
-#define CONTROL           0xF4  // W   Control registor 
+#define CONTROL           0xF4  // W   Control register 
 #define CONTROL_OUTPUT    0xF6  // R   Output registers 0xF6=MSB, 0xF7=LSB, 0xF8=XLSB
+
+// unused registers
+#define SOFTRESET         0xE0
+#define VERSION           0xD1  // ML_VERSION  pos=0 len=4 msk=0F  AL_VERSION pos=4 len=4 msk=f0
+#define CHIPID            0xD0  // pos=0 mask=FF len=8
+                                // BMP085_CHIP_ID=0x55
 
 /************************************/
 /*    REGISTERS PARAMETERS          */
@@ -84,26 +90,26 @@ public:
   
   // BMP initialization
   void init();                                              // sets current elevation above ground level to 0 meters
-  void init(byte _BMPMode, float _initVal, bool _meters);   // sets a reference datum
-                                                            // if _meters=false _initVal is hPa
+  void init(byte _BMPMode, int32_t _initVal, bool _centimeters);   // sets a reference datum
+                                                            // if _centimeters=false _initVal is hPa
   // Who Am I
   byte getDevAddr();
   
   // BMP mode  
   byte getMode();        
-  void setMode(byte _BMPMode);                  // BMP085 mode 
+  void setMode(byte _BMPMode);                   // BMP085 mode 
   // initialization
-  void setLocalPressure(float _hPa);            // set known barometric pressure as reference Ex. QNH
-  void setLocalAbsAlt(float _meters);           // set known altitude as reference
-  void setAltOffset(float _meters);             // altitude offset
-  void sethPaOffset(float _hPa);                // pressure offset
-  void zeroCal(float _hPa, float _meters);      // zero Calibrate output to a specific hPa/altitude 
+  void setLocalPressure(int32_t _Pa);            // set known barometric pressure as reference Ex. QNH
+  void setLocalAbsAlt(int32_t _centimeters);     // set known altitude as reference
+  void setAltOffset(int32_t _centimeters);       // altitude offset
+  void sethPaOffset(int32_t _Pa);                // pressure offset
+  void zeroCal(int32_t _Pa, int32_t _centimeters);// zero Calibrate output to a specific hPa/altitude 
   // BMP Sensors
-  void getPressure(float *_hPa);                // pressure in hPa + offset  
-  void getAltitude(float *_meters);             // altitude in meters + offset  
-  void getTemperature(float *_Temperature);     // temperature in Cº   
-  void calcTrueTemperature();                   // calc temperature data b5 (only needed if AUTO_UPDATE_TEMPERATURE is false)  
-  void calcTruePressure(long *_TruePressure);   // calc Pressure in Pa     
+  void getPressure(int32_t *_Pa);                // pressure in hPa + offset  
+  void getAltitude(int32_t *_centimeters);       // altitude in meters + offset  
+  void getTemperature(int32_t *_Temperature);    // temperature in Cº   
+  void calcTrueTemperature();                    // calc temperature data b5 (only needed if AUTO_UPDATE_TEMPERATURE is false)  
+  void calcTruePressure(long *_TruePressure);    // calc Pressure in Pa     
   // dummy stuff
    void dumpCalData();                           // debug only
 
@@ -118,11 +124,11 @@ public:
   
   uint8_t _dev_address;
   byte _buff[BUFFER_SIZE];                      // buffer  MSB LSB XLSB
-  byte _oss;                                    // OverSamplingSetting
+  int _oss;                                     // OverSamplingSetting
   int _pressure_waittime[4];                    // Max. Conversion Time Pressure is ms for each mode
   
-  float _meter_Offset, _hPa_Offset;
-  float _param_datum, _param_meters;
+  int32_t _cm_Offset, _Pa_Offset;
+  int32_t _param_datum, _param_centimeters;
 
   void getCalData();        
   
