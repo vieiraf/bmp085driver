@@ -1,6 +1,6 @@
 /****************************************************************************
 * BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino       *
-* Copyright 2010 Filipe Vieira                                              *
+* Copyright 2010-2011 Filipe Vieira & various contributors                  *
 *                                                                           *
 * This file is part of BMP085 Arduino library.                              *
 *                                                                           *

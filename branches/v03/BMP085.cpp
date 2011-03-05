@@ -1,6 +1,6 @@
 /****************************************************************************
 * BMP085.cpp - BMP085/I2C (Digital Pressure Sensor) library for Arduino     *
-* Copyright 2010 Filipe Vieira                                              *
+* Copyright 2010-2011 Filipe Vieira & various contributors                  *
 *                                                                           *
 * This file is part of BMP085 Arduino library.                              *
 *                                                                           *
@@ -33,10 +33,10 @@
 
 BMP085::BMP085() {
   _dev_address = BMP085_ADDR;
-  _pressure_waittime[0] = 4500; // These are maximum convertion times.
-  _pressure_waittime[1] = 7500; // It is possible to use pin EOC (End Of Conversion)
-  _pressure_waittime[2] = 13500;// to check if conversion is finished (logic 1) 
-  _pressure_waittime[3] = 25500;// or running (logic 0) insted of waiting for convertion times.
+  _pressure_waittime[0] = 5; // These are maximum convertion times.
+  _pressure_waittime[1] = 8; // It is possible to use pin EOC (End Of Conversion)
+  _pressure_waittime[2] = 14;// to check if conversion is finished (logic 1) 
+  _pressure_waittime[3] = 26;// or running (logic 0) insted of waiting for convertion times.
   _cm_Offset = 0;
   _Pa_Offset = 0;               // 1hPa = 100Pa = 1mbar
   
@@ -140,7 +140,7 @@ void BMP085::calcTruePressure(long *_TruePressure) {
  
  //read Raw Pressure
   writemem(CONTROL, READ_PRESSURE+(_oss << 6));
-  delayMicroseconds(_pressure_waittime[_oss]);    
+  delay(_pressure_waittime[_oss]);    
   readmem(CONTROL_OUTPUT, 3, _buff);  
   up = ((((long)_buff[0] <<16) | ((long)_buff[1] <<8) | ((long)_buff[2])) >> (8-_oss)); // uncompensated pressure value
   
@@ -149,7 +149,6 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   x1 = (b2* (b6 * b6 >> 12)) >> 11;
   x2 = ac2 * b6 >> 11;
   x3 = x1 + x2;
-  //b3 = ((((int32_t)ac1 * 4 + x3) << _oss) + 2) >> 2;  // not working for oss = 3  
   tmp = ac1;
   tmp = (tmp * 4 + x3) << _oss;
   b3 = (tmp + 2) >> 2;    // not working for oss = 3
@@ -209,11 +208,11 @@ void BMP085::getCalData() {
   readmem(CAL_AC3, 2, _buff);
   ac3 = ((int)_buff[0] <<8 | ((int)_buff[1]));
   readmem(CAL_AC4, 2, _buff);
-  ac4 = ((int)_buff[0] <<8 | ((int)_buff[1]));
+  ac4 = ((unsigned int)_buff[0] <<8 | ((unsigned int)_buff[1]));
   readmem(CAL_AC5, 2, _buff);
-  ac5 = ((int)_buff[0] <<8 | ((int)_buff[1]));
+  ac5 = ((unsigned int)_buff[0] <<8 | ((unsigned int)_buff[1]));
   readmem(CAL_AC6, 2, _buff);
-  ac6 = ((int)_buff[0] <<8 | ((int)_buff[1])); 
+  ac6 = ((unsigned int)_buff[0] <<8 | ((unsigned int)_buff[1])); 
   readmem(CAL_B1, 2, _buff);
   b1 = ((int)_buff[0] <<8 | ((int)_buff[1])); 
   readmem(CAL_B2, 2, _buff);
