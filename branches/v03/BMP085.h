@@ -83,7 +83,7 @@
 #define READ_TEMPERATURE        0x2E 
 #define READ_PRESSURE           0x34 
 //Other
-#define MSLP                    1013.25          // Mean Sea Level Pressure = 1013.25 hPA
+#define MSLP                    101325          // Mean Sea Level Pressure = 1013.25 hPA (1hPa = 100Pa = 1mbar)
 
 
 
@@ -94,7 +94,7 @@ public:
   // BMP initialization
   void init();                                              // sets current elevation above ground level to 0 meters
   void init(byte _BMPMode, int32_t _initVal, bool _centimeters);   // sets a reference datum
-                                                            // if _centimeters=false _initVal is hPa
+                                                            // if _centimeters=false _initVal is Pa
   // Who Am I
   byte getDevAddr();
   
@@ -106,10 +106,10 @@ public:
   void setLocalAbsAlt(int32_t _centimeters);     // set known altitude as reference
   void setAltOffset(int32_t _centimeters);       // altitude offset
   void sethPaOffset(int32_t _Pa);                // pressure offset
-  void zeroCal(int32_t _Pa, int32_t _centimeters);// zero Calibrate output to a specific hPa/altitude 
+  void zeroCal(int32_t _Pa, int32_t _centimeters);// zero Calibrate output to a specific Pa/altitude 
   // BMP Sensors
-  void getPressure(int32_t *_Pa);                // pressure in hPa + offset  
-  void getAltitude(int32_t *_centimeters);       // altitude in meters + offset  
+  void getPressure(int32_t *_Pa);                // pressure in Pa + offset  
+  void getAltitude(int32_t *_centimeters);       // altitude in centimeters + offset  
   void getTemperature(int32_t *_Temperature);    // temperature in Cº   
   void calcTrueTemperature();                    // calc temperature data b5 (only needed if AUTO_UPDATE_TEMPERATURE is false)  
   void calcTruePressure(long *_TruePressure);    // calc Pressure in Pa     

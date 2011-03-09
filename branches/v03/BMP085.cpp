@@ -100,13 +100,16 @@ void BMP085::getPressure(int32_t *_Pa){
 
   calcTruePressure(&TruePressure); 
   *_Pa = TruePressure / pow((1 - (float)_param_centimeters / 4433000), 5.255) + _Pa_Offset;
+  // converting from float to int32_t truncates toward zero, 1010.999985 becomes 1010 resulting in 1 Pa error (max).  
+  // Note that BMP085 abs accuracy from 700...1100hPa and 0..+65ºC is +-100Pa (typ.)
 }
 
 void BMP085::getAltitude(int32_t *_centimeters){
   long TruePressure;
 
   calcTruePressure(&TruePressure); 
-  *_centimeters =  4433000 * (1 - pow((TruePressure / (float)_param_datum), 0.190295)) + _cm_Offset;  
+  *_centimeters =  4433000 * (1 - pow((TruePressure / (float)_param_datum), 0.1903)) + _cm_Offset;  
+  // converting from float to int32_t truncates toward zero, 100.999985 becomes 100 resulting in 1 cm error (max).
 }
 
 void BMP085::getTemperature(int32_t *_Temperature) {
@@ -151,7 +154,7 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   x3 = x1 + x2;
   tmp = ac1;
   tmp = (tmp * 4 + x3) << _oss;
-  b3 = (tmp + 2) >> 2;    // not working for oss = 3
+  b3 = (tmp + 2) >> 2;
   x1 = ac3 * b6 >> 13;
   x2 = (b1 * (b6 * b6 >> 12)) >> 16;
   x3 = ((x1 + x2) + 2) >> 2;
