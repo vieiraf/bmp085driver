@@ -40,10 +40,7 @@
         // when true, temperature is measured everytime pressure is measured (Auto).
         // when false, user chooses when to measure temperature (just call calcTrueTemperature()).
         // used for dynamic measurement to increase sample rate (see BMP085 modes below).
-
-#define FILTERED_PRESSURE             // use exponential moving average on pressure calculation
-#define SMOOTHING_FACTOR        0.10  // smoothing factor 0 to 1
-        
+       
 /* ---- Registers ---- */
 #define CAL_AC1           0xAA  // R   Calibration data (16 bits)
 #define CAL_AC2           0xAC  // R   Calibration data (16 bits)

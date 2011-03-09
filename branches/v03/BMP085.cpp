@@ -165,13 +165,6 @@ void BMP085::calcTruePressure(long *_TruePressure) {
   x1 = (x1 * 3038) >> 16;
   x2 = (-7357 * p) >> 16;
   *_TruePressure = p + ((x1 + x2 + 3791) >> 4);
-  
-  #ifdef FILTERED_PRESSURE
-  if (oldEMA != 0) // 1st run?
-    *_TruePressure = oldEMA + SMOOTHING_FACTOR * (*_TruePressure - oldEMA);    
-  oldEMA = *_TruePressure;  
-  #endif
-
 }
 
 void BMP085::dumpCalData() {
