@@ -1,6 +1,6 @@
 /****************************************************************************
 * BMP085.cpp - BMP085/I2C (Digital Pressure Sensor) library for Arduino     *
-* Copyright 2010-2011 Filipe Vieira & various contributors                  *
+* Copyright 2010-2012 Filipe Vieira & various contributors                  *
 *                                                                           *
 * This file is part of BMP085 Arduino library.                              *
 *                                                                           *
@@ -122,7 +122,7 @@ void BMP085::calcTrueTemperature(){
 
   //read Raw Temperature
   writemem(CONTROL, READ_TEMPERATURE);
-  delayMicroseconds(4500);                          // min. 4.5ms read Temp delay
+  delay(5);                                         // min. 4.5ms read Temp delay
   readmem(CONTROL_OUTPUT, 2, _buff); 
   ut = ((long)_buff[0] << 8 | ((long)_buff[1]));    // uncompensated temperature value
   
@@ -224,21 +224,21 @@ void BMP085::getCalData() {
 
 void BMP085::writemem(uint8_t _addr, uint8_t _val) {
   Wire.beginTransmission(_dev_address);   // start transmission to device 
-  Wire.send(_addr); // send register address
-  Wire.send(_val); // send value to write
+  Wire.write(_addr); // send register address
+  Wire.write(_val); // send value to write  
   Wire.endTransmission(); // end transmission
 }
 
 void BMP085::readmem(uint8_t _addr, uint8_t _nbytes, uint8_t __buff[]) {
   Wire.beginTransmission(_dev_address); // start transmission to device 
-  Wire.send(_addr); // sends register address to read from
+  Wire.write(_addr); // sends register address to read from
   Wire.endTransmission(); // end transmission
   
   Wire.beginTransmission(_dev_address); // start transmission to device 
   Wire.requestFrom(_dev_address, _nbytes);// send data n-bytes read
   uint8_t i = 0; 
   while (Wire.available()) {
-    __buff[i] = Wire.receive(); // receive DATA
+    __buff[i] = Wire.read(); // receive DATA
     i++;
   }
   Wire.endTransmission(); // end transmission
