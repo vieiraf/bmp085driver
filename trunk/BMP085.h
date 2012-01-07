@@ -1,6 +1,6 @@
 /****************************************************************************
 * BMP085.h - BMP085/I2C (Digital Pressure Sensor) library for Arduino       *
-* Copyright 2010-2011 Filipe Vieira & various contributors                  *
+* Copyright 2010-2012 Filipe Vieira & various contributors                  *
 *                                                                           *
 * This file is part of BMP085 Arduino library.                              *
 *                                                                           *
@@ -31,7 +31,11 @@
 #ifndef BMP085_h
 #define BMP085_h
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
 #include "WProgram.h"
+#endif
 
 #define BMP085_ADDR                 0x77     //0x77 default I2C address
 #define BUFFER_SIZE                 3
